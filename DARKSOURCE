@@ -1,0 +1,68 @@
+-- Place this in a LocalScript inside StarterGui
+
+--// SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+--// FAKE LOADING SCREEN
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0.4, 0, 0.1, 0)
+frame.Position = UDim2.new(0.3, 0, 0.45, 0)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+local bar = Instance.new("Frame", frame)
+bar.Size = UDim2.new(0, 0, 1, 0)
+bar.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+
+-- Animate fake load
+local tween = TweenService:Create(bar, TweenInfo.new(3), {Size = UDim2.new(1,0,1,0)})
+tween:Play()
+tween.Completed:Wait()
+
+frame:Destroy() -- remove loading screen
+
+--// EGG ESP DEMO
+for _, egg in pairs(workspace:GetChildren()) do
+	if egg:IsA("Model") and egg.Name:lower():find("egg") then
+		local highlight = Instance.new("Highlight")
+		highlight.FillColor = Color3.fromRGB(255, 200, 0)
+		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+		highlight.Parent = egg
+	end
+end
+
+--// SIMPLE PET SPAWNER
+local function spawnPet()
+	local pet = Instance.new("Part")
+	pet.Shape = Enum.PartType.Ball
+	pet.Color = Color3.fromRGB(0, 200, 255)
+	pet.Size = Vector3.new(2,2,2)
+	pet.Anchored = false
+	pet.CanCollide = false
+	pet.Parent = workspace
+
+	-- Attach pet to follow character
+	local hrp = character:WaitForChild("HumanoidRootPart")
+	local attachment1 = Instance.new("Attachment", hrp)
+	local attachment2 = Instance.new("Attachment", pet)
+
+	local align = Instance.new("AlignPosition", pet)
+	align.Attachment0 = attachment2
+	align.Attachment1 = attachment1
+	align.RigidityEnabled = false
+	align.Responsiveness = 10
+	align.MaxForce = 20000
+
+	-- offset so pet follows beside you
+	attachment2.Position = Vector3.new(math.random(-4,4), 2, math.random(-4,4))
+
+	return pet
+end
+
+-- Spawn 3 pets for fun
+for i=1,3 do
+	spawnPet()
+end
